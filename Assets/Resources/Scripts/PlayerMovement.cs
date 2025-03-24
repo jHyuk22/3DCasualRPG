@@ -2,15 +2,24 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float playerMoveSpeed = 5f;
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        MovePlayer();
+    }
+
+    private void MovePlayer()
+    {
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+
+        Vector3 moveVec = new Vector3(moveX, 0, moveZ) * playerMoveSpeed * Time.deltaTime;
+        transform.Translate(moveVec, Space.World);
     }
 }
