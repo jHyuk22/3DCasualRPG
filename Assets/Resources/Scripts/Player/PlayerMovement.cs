@@ -1,71 +1,32 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class PlayerMovement : MonoBehaviour
 {
-    //public float playerMoveSpeed = 5f;
+    public Camera mainCamera; // ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½
+    public UnityEngine.AI.NavMeshAgent agent; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½×ºï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+    public Animator animator;
 
-    //void Start()
-    //{
-
-    //}
-
-    //private void FixedUpdate()
-    //{
-    //    MovePlayer();
-    //}
-
-    //private void MovePlayer()
-    //{
-    //    float moveX = Input.GetAxis("Horizontal");
-    //    float moveZ = Input.GetAxis("Vertical");
-
-    //    Vector3 moveVec = new Vector3(moveX, 0, moveZ) * playerMoveSpeed * Time.deltaTime;
-    //    transform.Translate(moveVec, Space.World);
-    //}
-
-    public Camera mainCamera; // ¸ÞÀÎ Ä«¸Þ¶ó
-    public NavMeshAgent agent; // ÇÃ·¹ÀÌ¾îÀÇ ³×ºñ°ÔÀÌ¼Ç ¿¡ÀÌÀüÆ®
-    public GameObject cursorPrefab = null;
-
-    void MovePlayerToClick()
-    {
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition); // ¸¶¿ì½º À§Ä¡ ¡æ ·¹ÀÌ ¹ß»ç
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit)) // Ãæµ¹ °¨Áö
-        {
-            if (hit.collider.CompareTag("Ground")) // ¶¥À» Å¬¸¯Çß´ÂÁö È®ÀÎ
-            {
-                GameObject cursor = Instantiate(cursorPrefab);
-                cursor.transform.Translate(hit.point);
-                agent.SetDestination(hit.point); // ÇÃ·¹ÀÌ¾î ÀÌµ¿
-            }
-        }
-    }
-
-    Vector3 destPos;
-    Vector3 dir;
-    Quaternion lookTarget;
+    private Vector3 destPos;
+    private Vector3 dir;
+    private Quaternion lookTarget;
 
     bool move = false;
 
     private void Update()
     {
-        // ¿ÞÂÊ ¸¶¿ì½º ¹öÆ°À» ´­·¶À» ¶§
+        animator.SetBool("IsRunning", move);
+
         if (Input.GetMouseButtonDown(1))
         {
             RaycastHit hit;
-            // ¸ÞÀÎ Ä«¸Þ¶ó¸¦ ÅëÇØ ¸¶¿ì½º Å¬¸¯ÇÑ °÷ÀÇ ray Á¤º¸¸¦ °¡Á®¿È
+            // ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ray ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // ray¿Í ´êÀº ¹°Ã¼°¡ ÀÖ´ÂÁö °Ë»ç
+            // rayï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
             if (Physics.Raycast(ray, out hit, 100f))
             {
                 print(hit.transform.name);
                 destPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
-                GameObject cursor = Instantiate(cursorPrefab);
-                cursor.transform.Translate(destPos);
                 dir = destPos - transform.position;
                 lookTarget = Quaternion.LookRotation(dir);
                 move = true;
@@ -79,13 +40,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (move)
         {
-            // ÀÌµ¿ÇÒ ¹æÇâÀ¸·Î Time.deltaTime * 2f ÀÇ ¼Óµµ·Î ¿òÁ÷ÀÓ.
+            // ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Time.deltaTime * 2f ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
             transform.position += dir.normalized * Time.deltaTime * 2f;
-            // ÇöÀç ¹æÇâ¿¡¼­ ¿òÁ÷¿©¾ßÇÒ ¹æÇâÀ¸·Î ºÎµå·´°Ô È¸Àü
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¿¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµå·´ï¿½ï¿½ È¸ï¿½ï¿½
             transform.rotation = Quaternion.Lerp(transform.rotation, lookTarget, 0.25f);
 
-            // Ä³¸¯ÅÍÀÇ À§Ä¡¿Í ¸ñÇ¥ À§Ä¡ÀÇ °Å¸®°¡ 0.05f º¸´Ù Å« µ¿¾È¸¸ ÀÌµ¿
+            // Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Å¸ï¿½ï¿½ï¿½ 0.05f ï¿½ï¿½ï¿½ï¿½ Å« ï¿½ï¿½ï¿½È¸ï¿½ ï¿½Ìµï¿½
             move = (transform.position - destPos).magnitude > 0.05f;
         }
     }
 }
+
