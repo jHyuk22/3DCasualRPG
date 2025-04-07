@@ -5,13 +5,19 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [Serializable]
-public class UserAuthInfo
+public struct UserAuthInfo
 {
-    public string userId = "";
-    public string password = "";
+    public string userId;
+    public string password;
+
+    public UserAuthInfo(string userId, string password)
+    {
+        this.userId = userId;
+        this.password = password;
+    }
 }
 
-public class UserAuth : MonoBehaviour
+public class LogInPopUp : BaseUI
 {
     private string url = "http://13.124.148.53:8080";
 
@@ -22,12 +28,7 @@ public class UserAuth : MonoBehaviour
 
     public UserAuthInfo PackData()
     {
-        UserAuthInfo data = new UserAuthInfo();
-
-        data.userId = id.text;
-        data.password = password.text;
-
-        return data;
+        return new UserAuthInfo(id.text, password.text);
     }
 
     public void LogIn()
@@ -46,11 +47,6 @@ public class UserAuth : MonoBehaviour
         StartCoroutine(Post(path, requestData));
     }
 
-    public void Test()
-    {
-        StartCoroutine(UnityWebRequestGetTest());
-    }
-
     IEnumerator Post(string path, string requestData)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.PostWwwForm(path, requestData))
@@ -63,10 +59,20 @@ public class UserAuth : MonoBehaviour
             yield return webRequest.SendWebRequest();
 
             if (webRequest.error == null)
-                Debug.Log(webRequest.downloadHandler.text);
+            {
+                UIManager.Instance.Instantiate(UIType.CharacterSelectPopUp);
+
+            }
             else
-                Debug.Log(webRequest.error);
+            {
+                Debug.LogError(webRequest.error);
+            }
         }
+    }
+
+    public void Test()
+    {
+        StartCoroutine(UnityWebRequestGetTest());
     }
 
     IEnumerator UnityWebRequestGetTest()

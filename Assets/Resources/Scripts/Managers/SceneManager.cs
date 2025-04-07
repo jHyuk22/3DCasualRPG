@@ -3,7 +3,7 @@ public enum SceneName
 {
     None = 0,
     Intro,
-    Village,
+    Town,
 }
 public class SceneManager : MonoBehaviour
 {
@@ -17,11 +17,6 @@ public class SceneManager : MonoBehaviour
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
-    }
-
-    public void OnClickOK(string sceneName)
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
 
     public void LoadScene(SceneName sceneName)
